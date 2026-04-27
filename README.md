@@ -9,6 +9,7 @@ A local, client-side image resizing tool. Drop in an image, resize it, download 
 - [Base UI](https://base-ui.com) — headless primitives (used for Dialog)
 - [Tailwind CSS](https://tailwindcss.com)
 - [lucide-react](https://lucide.dev) — icons
+- [pica](https://github.com/nodeca/pica) — high-quality client-side image resizing using a Lanczos kernel
 
 ## Acknowledgements
 
