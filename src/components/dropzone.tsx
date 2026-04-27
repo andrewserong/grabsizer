@@ -49,6 +49,7 @@ type DropzoneContextType = {
 	maxFileSize: number;
 	maxFiles: number;
 	inputRef: React.RefObject<HTMLInputElement>;
+	onClear?: () => void;
 };
 
 const DropzoneContext = createContext<DropzoneContextType | undefined>(
@@ -61,6 +62,7 @@ type DropzoneProps = {
 	maxFileSize?: number;
 	accept?: string;
 	onChange?: (files: File[]) => void;
+	onClear?: () => void;
 };
 
 const Dropzone = ({
@@ -70,6 +72,7 @@ const Dropzone = ({
 	maxFileSize = Number.POSITIVE_INFINITY,
 	accept = "image/*",
 	onChange,
+	onClear,
 }: PropsWithChildren<DropzoneProps>) => {
 	const [files, setFiles] = useState<DropzoneFile[]>([]);
 	const [isDragActive, setIsDragActive] = useState(false);
@@ -191,6 +194,7 @@ const Dropzone = ({
 				maxFileSize,
 				maxFiles,
 				inputRef,
+				onClear,
 			}}
 		>
 			<div
@@ -223,14 +227,18 @@ const Dropzone = ({
 };
 
 const DropzoneContent = ({ className }: { className?: string }) => {
-	const { files, setFiles } = useDropzoneContext();
+	const { files, setFiles, onClear } = useDropzoneContext();
 
 	const handleRemove = useCallback(
 		(e: React.MouseEvent, name: string) => {
 			e.stopPropagation();
-			setFiles((prev) => prev.filter((f) => f.name !== name));
+			setFiles((prev) => {
+				const next = prev.filter((f) => f.name !== name);
+				if (next.length === 0) onClear?.();
+				return next;
+			});
 		},
-		[setFiles]
+		[setFiles, onClear]
 	);
 
 	if (files.length === 0) return null;

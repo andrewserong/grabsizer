@@ -45,6 +45,16 @@ export function App() {
 		setOutput({ url, blob: result.blob, fileName: file.name, width: result.width, height: result.height });
 	}, []);
 
+	const handleClear = useCallback(() => {
+		if (prevUrlRef.current) {
+			URL.revokeObjectURL(prevUrlRef.current);
+			prevUrlRef.current = null;
+		}
+		setOutput(null);
+		setCopied(false);
+		if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+	}, []);
+
 	const handleCopy = useCallback(async () => {
 		if (!output) return;
 		await navigator.clipboard.write([
@@ -108,7 +118,7 @@ export function App() {
 			<main className="w-full">
 				<div className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
 					<div className="mx-auto w-full max-w-sm">
-						<Dropzone onChange={handleFilesChange}>
+						<Dropzone onChange={handleFilesChange} onClear={handleClear}>
 							<DropzoneEmptyState />
 							<DropzoneContent />
 						</Dropzone>
