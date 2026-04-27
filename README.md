@@ -1,21 +1,15 @@
-# React + TypeScript + Vite + shadcn/ui
+# Grabsizer
 
-This is a template for a new Vite project with React, TypeScript, and shadcn/ui.
+A local, client-side image resizing tool. Drop in an image, resize it, download the result — no uploads to any server.
 
-## Adding components
+## Built with
 
-To add components to your app, run the following command:
+- [Vite](https://vite.dev) + [React](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
+- [shadcn/ui](https://ui.shadcn.com) — component scaffolding and UI primitives
+- [Base UI](https://base-ui.com) — headless primitives (used for Dialog)
+- [Tailwind CSS](https://tailwindcss.com)
+- [lucide-react](https://lucide.dev) — icons
 
-```bash
-npx shadcn@latest add button
-```
+## Acknowledgements
 
-This will place the ui components in the `src/components` directory.
-
-## Using components
-
-To use the components in your app, import them as follows:
-
-```tsx
-import { Button } from "@/components/ui/button"
-```
+The `Dropzone` component (`src/components/dropzone.tsx`) was adapted from the [Supabase UI dropzone block](https://supabase.com/ui/docs/nextjs/dropzone). The server upload logic and Supabase Storage integration have been removed in favour of local-only file handling, but the component structure and visual design originated there.

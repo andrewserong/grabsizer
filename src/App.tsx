@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Dropzone, DropzoneContent, DropzoneEmptyState } from "@/components/dropzone"
 import { SunMoon } from "lucide-react"
 import { Cog } from "lucide-react"
 import { useTheme } from "./components/theme-provider"
@@ -55,6 +56,12 @@ export function App() {
       <main className="w-full p-8">
         <div className="flex min-h-svh justify-center p-6">
           <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
+            <div className="w-[500px]">
+              <Dropzone>
+                <DropzoneEmptyState />
+                <DropzoneContent />
+              </Dropzone>
+            </div>
             <div>
               <h1 className="font-medium">Project ready!</h1>
               <p>You may now add components and start building.</p>
