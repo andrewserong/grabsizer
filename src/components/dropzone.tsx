@@ -36,6 +36,8 @@ type DropzoneFile = {
 	size: number;
 	type: string;
 	preview: string;
+	width?: number;
+	height?: number;
 	errors: { message: string }[];
 };
 
@@ -76,28 +78,42 @@ const Dropzone = ({
 	const dragCounter = useRef(0);
 
 	const processFiles = useCallback(
-		(rawFiles: FileList | File[]) => {
+		async (rawFiles: FileList | File[]) => {
 			const incoming = Array.from(rawFiles).slice(0, maxFiles);
-			const next: DropzoneFile[] = incoming.map((file) => {
-				const errors: { message: string }[] = [];
-				if (
-					maxFileSize !== Number.POSITIVE_INFINITY &&
-					file.size > maxFileSize
-				)
-					errors.push({
-						message: `File is larger than ${formatBytes(maxFileSize)}`,
-					});
-				return {
-					file,
-					name: file.name,
-					size: file.size,
-					type: file.type,
-					preview: file.type.startsWith("image/")
-						? URL.createObjectURL(file)
-						: "",
-					errors,
-				};
-			});
+			const next: DropzoneFile[] = await Promise.all(
+				incoming.map(async (file) => {
+					const errors: { message: string }[] = [];
+					if (
+						maxFileSize !== Number.POSITIVE_INFINITY &&
+						file.size > maxFileSize
+					)
+						errors.push({
+							message: `File is larger than ${formatBytes(maxFileSize)}`,
+						});
+
+					let width: number | undefined;
+					let height: number | undefined;
+					if (file.type.startsWith("image/")) {
+						const bitmap = await createImageBitmap(file);
+						width = bitmap.width;
+						height = bitmap.height;
+						bitmap.close();
+					}
+
+					return {
+						file,
+						name: file.name,
+						size: file.size,
+						type: file.type,
+						preview: file.type.startsWith("image/")
+							? URL.createObjectURL(file)
+							: "",
+						width,
+						height,
+						errors,
+					};
+				})
+			);
 			setFiles(next);
 			onChange?.(incoming);
 		},
@@ -254,6 +270,9 @@ const DropzoneContent = ({ className }: { className?: string }) => {
 						) : (
 							<p className="text-xs text-muted-foreground">
 								{formatBytes(file.size, 2)}
+								{file.width && file.height && (
+									<> &middot; {file.width}px &times; {file.height}px</>
+								)}
 							</p>
 						)}
 					</div>

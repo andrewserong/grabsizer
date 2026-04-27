@@ -12,37 +12,53 @@ import {
 	Dropzone,
 	DropzoneContent,
 	DropzoneEmptyState,
+	formatBytes,
 } from "@/components/dropzone";
 import { ImagePreview } from "@/components/image-preview";
 import { resizeImage } from "@/lib/resize";
 import { SunMoon, Cog } from "lucide-react";
 import { useTheme } from "./components/theme-provider";
 
+type Output = {
+	url: string;
+	blob: Blob;
+	fileName: string;
+	width: number;
+	height: number;
+};
+
 export function App() {
 	const { theme, setTheme } = useTheme();
-	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-	const [resizing, setResizing] = useState(false);
+	const [output, setOutput] = useState<Output | null>(null);
+	const [copied, setCopied] = useState(false);
 	const prevUrlRef = useRef<string | null>(null);
+	const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const handleFilesChange = useCallback(async (files: File[]) => {
 		const file = files[0];
 		if (!file) return;
 
-		setResizing(true);
-		try {
-			const result = await resizeImage(file);
-			const url = URL.createObjectURL(result.blob);
-			if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-			prevUrlRef.current = url;
-			setPreviewUrl(url);
-		} finally {
-			setResizing(false);
-		}
+		const result = await resizeImage(file);
+		const url = URL.createObjectURL(result.blob);
+		if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+		prevUrlRef.current = url;
+		setOutput({ url, blob: result.blob, fileName: file.name, width: result.width, height: result.height });
 	}, []);
+
+	const handleCopy = useCallback(async () => {
+		if (!output) return;
+		await navigator.clipboard.write([
+			new ClipboardItem({ [output.blob.type]: output.blob }),
+		]);
+		setCopied(true);
+		if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+		copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
+	}, [output]);
 
 	useEffect(() => {
 		return () => {
 			if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+			if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
 		};
 	}, []);
 
@@ -97,13 +113,28 @@ export function App() {
 							<DropzoneContent />
 						</Dropzone>
 					</div>
-					{resizing && (
-						<p className="text-sm text-muted-foreground">
-							Resizing…
-						</p>
-					)}
-					{previewUrl && !resizing && (
-						<ImagePreview src={previewUrl} />
+					{output && (
+						<div key={output.url} className="animate-in fade-in-0 duration-500 flex flex-col gap-3">
+							<ImagePreview src={output.url} />
+							<div className="flex items-center rounded-lg border border-border bg-card p-4">
+								<div className="flex min-w-0 grow flex-col">
+									<p className="truncate text-sm">
+										{output.fileName}
+									</p>
+									<p className="text-xs text-muted-foreground">
+										{formatBytes(output.blob.size)} &middot; {output.width}px × {output.height}px
+									</p>
+								</div>
+								<Button
+									variant="outline"
+									size="sm"
+									className="font-normal"
+									onClick={handleCopy}
+								>
+									{copied ? "Copied" : "Copy"}
+								</Button>
+							</div>
+						</div>
 					)}
 				</div>
 			</main>
