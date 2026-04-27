@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -12,13 +13,39 @@ import {
 	DropzoneContent,
 	DropzoneEmptyState,
 } from "@/components/dropzone";
-import { SunMoon } from "lucide-react";
-import { Cog } from "lucide-react";
+import { ImagePreview } from "@/components/image-preview";
+import { resizeImage } from "@/lib/resize";
+import { SunMoon, Cog } from "lucide-react";
 import { useTheme } from "./components/theme-provider";
 
 export function App() {
 	const { theme, setTheme } = useTheme();
-	console.log("Current theme:", theme);
+	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+	const [resizing, setResizing] = useState(false);
+	const prevUrlRef = useRef<string | null>(null);
+
+	const handleFilesChange = useCallback(async (files: File[]) => {
+		const file = files[0];
+		if (!file) return;
+
+		setResizing(true);
+		try {
+			const result = await resizeImage(file);
+			const url = URL.createObjectURL(result.blob);
+			if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+			prevUrlRef.current = url;
+			setPreviewUrl(url);
+		} finally {
+			setResizing(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		return () => {
+			if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+		};
+	}, []);
+
 	return (
 		<>
 			<header className="sticky top-0 z-50 w-full bg-background">
@@ -62,30 +89,22 @@ export function App() {
 					</div>
 				</div>
 			</header>
-			<main className="w-full p-8">
-				<div className="flex min-h-svh justify-center p-6">
-					<div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-						<div className="w-[500px]">
-							<Dropzone>
-								<DropzoneEmptyState />
-								<DropzoneContent />
-							</Dropzone>
-						</div>
-						<div>
-							<h1 className="font-medium">Project ready!</h1>
-							<p>
-								You may now add components and start building.
-							</p>
-							<p>
-								We&apos;ve already added the button component
-								for you.
-							</p>
-							<Button className="mt-2">Button</Button>
-						</div>
-						<div className="font-mono text-xs text-muted-foreground">
-							(Press <kbd>d</kbd> to toggle dark mode)
-						</div>
+			<main className="w-full">
+				<div className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
+					<div className="mx-auto w-full max-w-sm">
+						<Dropzone onChange={handleFilesChange}>
+							<DropzoneEmptyState />
+							<DropzoneContent />
+						</Dropzone>
 					</div>
+					{resizing && (
+						<p className="text-sm text-muted-foreground">
+							Resizing…
+						</p>
+					)}
+					{previewUrl && !resizing && (
+						<ImagePreview src={previewUrl} />
+					)}
 				</div>
 			</main>
 		</>
