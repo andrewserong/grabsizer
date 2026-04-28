@@ -17,7 +17,7 @@ import {
 import { ImagePreview } from "@/components/image-preview";
 import { resizeImage } from "@/lib/resize";
 import { Input } from "@/components/ui/input";
-import { SunMoon, Cog, Download, Copy } from "lucide-react";
+import { SunMoon, Cog, Download, Copy, CircleHelp } from "lucide-react";
 import { useTheme } from "./components/theme-provider";
 
 type Output = {
@@ -147,7 +147,7 @@ export function App() {
 	}, []);
 
 	return (
-		<>
+		<div className="flex min-h-svh flex-col">
 			<header className="sticky top-0 z-50 w-full bg-background">
 				<div className="m-auto flex max-w-3xl items-center justify-between p-2">
 					<span className="text-sm leading-none">Grabsizer</span>
@@ -221,7 +221,7 @@ export function App() {
 					</div>
 				</div>
 			</header>
-			<main className="w-full">
+			<main className="w-full grow">
 				<div className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
 					<div className="mx-auto w-full max-w-sm">
 						<Dropzone onChange={handleFilesChange} onClear={handleClear}>
@@ -266,7 +266,10 @@ export function App() {
 									>
 										<span className="flex items-center gap-1.5">
 											<Copy className="size-3.5" />
-											{copied ? "Copied" : "Copy .png"}
+											<span className="relative">
+												<span className="invisible">Copy .png</span>
+												<span className="absolute inset-0 flex items-center">{copied ? "Copied!" : "Copy .png"}</span>
+											</span>
 										</span>
 										{pngBlob && (
 											<span className="text-xs text-muted-foreground">
@@ -283,7 +286,32 @@ export function App() {
 					)}
 				</div>
 			</main>
-		</>
+			<footer className="sticky bottom-0 z-50 w-full bg-background">
+				<div className="m-auto flex max-w-3xl justify-end p-2">
+					<Dialog>
+						<DialogTrigger
+							render={
+								<Button
+									variant="ghost"
+									size="icon"
+									className="rounded-full border border-border"
+								>
+									<CircleHelp />
+								</Button>
+							}
+						></DialogTrigger>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>What is this nonsense?</DialogTitle>
+								<DialogDescription>
+									I'm always finding myself taking screengrabs for Github issues and PRs and they wind up being much too large. Sometimes I'll resize them in Photoshop or Affinity, but it seems a little too heavy handed for such a simple task. This little web app is here to make that task quicker. It's likely to be used just by me, but hey, if you're here, I hope you like it, too.
+								</DialogDescription>
+							</DialogHeader>
+						</DialogContent>
+					</Dialog>
+				</div>
+			</footer>
+		</div>
 	);
 }
 
