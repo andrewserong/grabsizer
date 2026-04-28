@@ -16,6 +16,7 @@ import {
 } from "@/components/dropzone";
 import { ImagePreview } from "@/components/image-preview";
 import { resizeImage } from "@/lib/resize";
+import { Input } from "@/components/ui/input";
 import { SunMoon, Cog } from "lucide-react";
 import { useTheme } from "./components/theme-provider";
 
@@ -39,6 +40,7 @@ export function App() {
 	const { theme, setTheme } = useTheme();
 	const [originalFile, setOriginalFile] = useState<File | null>(null);
 	const [maxWidth, setMaxWidth] = useState(DEFAULT_MAX_WIDTH);
+	const [quality, setQuality] = useState(82);
 	const [output, setOutput] = useState<Output | null>(null);
 	const [pngBlob, setPngBlob] = useState<Blob | null>(null);
 	const [jpgBlob, setJpgBlob] = useState<Blob | null>(null);
@@ -67,7 +69,9 @@ export function App() {
 		return () => { cancelled = true; };
 	}, [originalFile, maxWidth]);
 
-	// Compute all format blobs whenever the resized output changes
+	// Compute all format blobs whenever the resized output or quality changes.
+	// PNG is lossless so we short-circuit it when the source is already PNG;
+	// JPG and WebP always go through canvas so the quality setting is applied.
 	useEffect(() => {
 		if (!output) {
 			setPngBlob(null);
@@ -75,11 +79,8 @@ export function App() {
 			setWebpBlob(null);
 			return;
 		}
-		if (output.blob.type === "image/png") setPngBlob(output.blob);
-		if (output.blob.type === "image/jpeg") setJpgBlob(output.blob);
 
-		const needsPng = output.blob.type !== "image/png";
-		const needsJpg = output.blob.type !== "image/jpeg";
+		if (output.blob.type === "image/png") setPngBlob(output.blob);
 
 		let cancelled = false;
 		createImageBitmap(output.blob).then((bitmap) => {
@@ -88,12 +89,14 @@ export function App() {
 			canvas.height = bitmap.height;
 			canvas.getContext("2d")!.drawImage(bitmap, 0, 0);
 			bitmap.close();
-			if (needsPng) canvas.toBlob((b) => { if (!cancelled && b) setPngBlob(b); }, "image/png");
-			if (needsJpg) canvas.toBlob((b) => { if (!cancelled && b) setJpgBlob(b); }, "image/jpeg", 0.92);
-			canvas.toBlob((b) => { if (!cancelled && b) setWebpBlob(b); }, "image/webp", 0.85);
+			if (output.blob.type !== "image/png") {
+				canvas.toBlob((b) => { if (!cancelled && b) setPngBlob(b); }, "image/png");
+			}
+			canvas.toBlob((b) => { if (!cancelled && b) setJpgBlob(b); }, "image/jpeg", quality / 100);
+			canvas.toBlob((b) => { if (!cancelled && b) setWebpBlob(b); }, "image/webp", quality / 100);
 		});
 		return () => { cancelled = true; };
-	}, [output]);
+	}, [output, quality]);
 
 	const handleClear = useCallback(() => {
 		if (prevUrlRef.current) {
@@ -177,23 +180,40 @@ export function App() {
 										Grabsizer settings
 									</DialogTitle>
 									<DialogDescription>
-										Adjust the maximum output width.
+										Configure output size and compression quality.
 									</DialogDescription>
 								</DialogHeader>
-								<div className="flex flex-col gap-2 pt-2">
-									<p className="text-sm font-medium">Output size</p>
-									<div className="flex gap-2">
-										{SIZE_PRESETS.map((preset) => (
-											<Button
-												key={preset.width}
-												variant={maxWidth === preset.width ? "default" : "outline"}
-												size="sm"
-												onClick={() => setMaxWidth(preset.width)}
-											>
-												{preset.label}
-												<span className="text-xs opacity-60">{preset.width}px</span>
-											</Button>
-										))}
+								<div className="flex flex-col gap-4 pt-2">
+									<div className="flex flex-col gap-2">
+										<p className="text-sm font-medium">Output size</p>
+										<div className="flex gap-2">
+											{SIZE_PRESETS.map((preset) => (
+												<Button
+													key={preset.width}
+													variant={maxWidth === preset.width ? "default" : "outline"}
+													size="sm"
+													onClick={() => setMaxWidth(preset.width)}
+												>
+													{preset.label}
+													<span className="text-xs opacity-60">{preset.width}px</span>
+												</Button>
+											))}
+										</div>
+									</div>
+									<div className="flex flex-col gap-2">
+										<p className="text-sm font-medium">Quality</p>
+										<div className="flex items-center gap-2">
+											<Input
+												type="number"
+												min={1}
+												max={100}
+												defaultValue={quality}
+												onBlur={(e) => setQuality(Math.min(100, Math.max(1, Number(e.target.value) || quality)))}
+												onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+												className="w-20"
+											/>
+											<span className="text-sm text-muted-foreground">% — applies to JPG and WebP</span>
+										</div>
 									</div>
 								</div>
 							</DialogContent>
