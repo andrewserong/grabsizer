@@ -17,7 +17,7 @@ import {
 import { ImagePreview } from "@/components/image-preview";
 import { resizeImage } from "@/lib/resize";
 import { Input } from "@/components/ui/input";
-import { SunMoon, Cog } from "lucide-react";
+import { SunMoon, Cog, Download, Copy } from "lucide-react";
 import { useTheme } from "./components/theme-provider";
 
 type Output = {
@@ -232,14 +232,8 @@ export function App() {
 					{output && (
 						<div key={output.url} className="animate-in fade-in-0 duration-500 flex flex-col gap-3">
 							<ImagePreview src={output.url} />
-							<div className="flex flex-col gap-3 border-t border-border pt-3">
-								<div className="flex min-w-0 flex-col">
-									<p className="truncate text-sm">{output.fileName}</p>
-									<p className="text-xs text-muted-foreground">
-										{formatBytes(output.blob.size)} &middot; {output.width}px × {output.height}px
-									</p>
-								</div>
-								<div className="flex flex-wrap items-center gap-2">
+							<div className="flex flex-col gap-3">
+								<div className="flex flex-wrap justify-center gap-2">
 									{(["jpg", "webp", "png"] as const).map((ext) => {
 										const blob = ext === "jpg" ? jpgBlob : ext === "webp" ? webpBlob : pngBlob;
 										return (
@@ -247,11 +241,14 @@ export function App() {
 												key={ext}
 												variant="outline"
 												size="sm"
-												className="h-auto flex-col gap-0.5 py-1.5 font-normal"
+												className="h-auto flex-col gap-0.5 rounded-lg py-1.5 font-normal"
 												onClick={makeDownloadHandler(blob, ext)}
 												disabled={!blob}
 											>
-												<span>Download as {ext.toUpperCase()}</span>
+												<span className="flex items-center gap-1.5">
+													<Download className="size-3.5" />
+													.{ext}
+												</span>
 												{blob && (
 													<span className="text-xs text-muted-foreground">
 														{formatBytes(blob.size)}
@@ -263,11 +260,14 @@ export function App() {
 									<Button
 										variant="ghost"
 										size="sm"
-										className="h-auto flex-col gap-0.5 border border-border py-1.5 font-normal"
+										className="h-auto flex-col gap-0.5 rounded-lg border border-border py-1.5 font-normal"
 										onClick={handleCopy}
 										disabled={!pngBlob}
 									>
-										<span>{copied ? "Copied" : "Copy as PNG"}</span>
+										<span className="flex items-center gap-1.5">
+											<Copy className="size-3.5" />
+											{copied ? "Copied" : "Copy .png"}
+										</span>
 										{pngBlob && (
 											<span className="text-xs text-muted-foreground">
 												{formatBytes(pngBlob.size)}
@@ -275,6 +275,9 @@ export function App() {
 										)}
 									</Button>
 								</div>
+								<p className="truncate text-center text-xs text-muted-foreground">
+									{output.fileName} &middot; {output.width} × {output.height}px
+								</p>
 							</div>
 						</div>
 					)}
