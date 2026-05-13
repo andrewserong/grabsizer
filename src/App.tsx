@@ -64,9 +64,17 @@ export function App() {
 			const url = URL.createObjectURL(result.blob);
 			if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
 			prevUrlRef.current = url;
-			setOutput({ url, blob: result.blob, fileName: originalFile.name, width: result.width, height: result.height });
+			setOutput({
+				url,
+				blob: result.blob,
+				fileName: originalFile.name,
+				width: result.width,
+				height: result.height,
+			});
 		});
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [originalFile, maxWidth]);
 
 	// Compute all format blobs whenever the resized output or quality changes.
@@ -90,12 +98,28 @@ export function App() {
 			canvas.getContext("2d")!.drawImage(bitmap, 0, 0);
 			bitmap.close();
 			if (output.blob.type !== "image/png") {
-				canvas.toBlob((b) => { if (!cancelled && b) setPngBlob(b); }, "image/png");
+				canvas.toBlob((b) => {
+					if (!cancelled && b) setPngBlob(b);
+				}, "image/png");
 			}
-			canvas.toBlob((b) => { if (!cancelled && b) setJpgBlob(b); }, "image/jpeg", quality / 100);
-			canvas.toBlob((b) => { if (!cancelled && b) setWebpBlob(b); }, "image/webp", quality / 100);
+			canvas.toBlob(
+				(b) => {
+					if (!cancelled && b) setJpgBlob(b);
+				},
+				"image/jpeg",
+				quality / 100
+			);
+			canvas.toBlob(
+				(b) => {
+					if (!cancelled && b) setWebpBlob(b);
+				},
+				"image/webp",
+				quality / 100
+			);
 		});
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [output, quality]);
 
 	const handleClear = useCallback(() => {
@@ -182,39 +206,73 @@ export function App() {
 										Grabsizer settings
 									</DialogTitle>
 									<DialogDescription>
-										Configure output size and compression quality.
+										Configure output size and compression
+										quality.
 									</DialogDescription>
 								</DialogHeader>
 								<div className="flex flex-col gap-4 pt-2">
 									<div className="flex flex-col gap-2">
-										<p className="text-sm font-medium">Output size</p>
+										<p className="text-sm font-medium">
+											Output size
+										</p>
 										<div className="flex gap-2">
 											{SIZE_PRESETS.map((preset) => (
 												<Button
 													key={preset.width}
-													variant={maxWidth === preset.width ? "default" : "outline"}
+													variant={
+														maxWidth ===
+														preset.width
+															? "default"
+															: "outline"
+													}
 													size="sm"
-													onClick={() => setMaxWidth(preset.width)}
+													onClick={() =>
+														setMaxWidth(
+															preset.width
+														)
+													}
 												>
 													{preset.label}
-													<span className="text-xs opacity-60">{preset.width}px</span>
+													<span className="text-xs opacity-60">
+														{preset.width}px
+													</span>
 												</Button>
 											))}
 										</div>
 									</div>
 									<div className="flex flex-col gap-2">
-										<p className="text-sm font-medium">Quality</p>
+										<p className="text-sm font-medium">
+											Quality
+										</p>
 										<div className="flex items-center gap-2">
 											<Input
 												type="number"
 												min={1}
 												max={100}
 												defaultValue={quality}
-												onBlur={(e) => setQuality(Math.min(100, Math.max(1, Number(e.target.value) || quality)))}
-												onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+												onBlur={(e) =>
+													setQuality(
+														Math.min(
+															100,
+															Math.max(
+																1,
+																Number(
+																	e.target
+																		.value
+																) || quality
+															)
+														)
+													)
+												}
+												onKeyDown={(e) =>
+													e.key === "Enter" &&
+													e.currentTarget.blur()
+												}
 												className="w-20"
 											/>
-											<span className="text-sm text-muted-foreground">% — applies to JPG and WebP</span>
+											<span className="text-sm text-muted-foreground">
+												% — applies to JPG and WebP
+											</span>
 										</div>
 									</div>
 								</div>
@@ -226,39 +284,57 @@ export function App() {
 			<main className="w-full grow">
 				<div className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
 					<div className="mx-auto w-full max-w-sm">
-						<Dropzone onChange={handleFilesChange} onClear={handleClear}>
+						<Dropzone
+							onChange={handleFilesChange}
+							onClear={handleClear}
+						>
 							<DropzoneEmptyState />
 							<DropzoneContent />
 						</Dropzone>
 					</div>
 					{output && (
-						<div key={output.url} className="animate-in fade-in-0 duration-500 flex flex-col gap-3">
+						<div
+							key={output.url}
+							className="flex animate-in flex-col gap-3 duration-500 fade-in-0"
+						>
 							<ImagePreview src={output.url} />
 							<div className="flex flex-col gap-3">
 								<div className="flex flex-wrap justify-center gap-2">
-									{(["jpg", "webp", "png"] as const).map((ext) => {
-										const blob = ext === "jpg" ? jpgBlob : ext === "webp" ? webpBlob : pngBlob;
-										return (
-											<Button
-												key={ext}
-												variant="outline"
-												size="sm"
-												className="h-auto flex-col gap-0.5 rounded-lg py-1.5 font-normal"
-												onClick={makeDownloadHandler(blob, ext)}
-												disabled={!blob}
-											>
-												<span className="flex items-center gap-1.5">
-													<Download className="size-3.5" />
-													.{ext}
-												</span>
-												{blob && (
-													<span className="text-xs text-muted-foreground">
-														{formatBytes(blob.size)}
+									{(["jpg", "webp", "png"] as const).map(
+										(ext) => {
+											const blob =
+												ext === "jpg"
+													? jpgBlob
+													: ext === "webp"
+														? webpBlob
+														: pngBlob;
+											return (
+												<Button
+													key={ext}
+													variant="outline"
+													size="sm"
+													className="h-auto flex-col gap-0.5 rounded-lg py-1.5 font-normal"
+													onClick={makeDownloadHandler(
+														blob,
+														ext
+													)}
+													disabled={!blob}
+												>
+													<span className="flex items-center gap-1.5">
+														<Download className="size-3.5" />
+														.{ext}
 													</span>
-												)}
-											</Button>
-										);
-									})}
+													{blob && (
+														<span className="text-xs text-muted-foreground">
+															{formatBytes(
+																blob.size
+															)}
+														</span>
+													)}
+												</Button>
+											);
+										}
+									)}
 									<Button
 										variant="ghost"
 										size="sm"
@@ -269,8 +345,14 @@ export function App() {
 										<span className="flex items-center gap-1.5">
 											<Copy className="size-3.5" />
 											<span className="relative">
-												<span className="invisible">Copy .png</span>
-												<span className="absolute inset-0 flex items-center">{copied ? "Copied!" : "Copy .png"}</span>
+												<span className="invisible">
+													Copy .png
+												</span>
+												<span className="absolute inset-0 flex items-center">
+													{copied
+														? "Copied!"
+														: "Copy .png"}
+												</span>
 											</span>
 										</span>
 										{pngBlob && (
@@ -281,7 +363,8 @@ export function App() {
 									</Button>
 								</div>
 								<p className="truncate text-center text-xs text-muted-foreground">
-									{output.fileName} &middot; {output.width} × {output.height}px
+									{output.fileName} &middot; {output.width} ×{" "}
+									{output.height}px
 								</p>
 							</div>
 						</div>
@@ -305,9 +388,19 @@ export function App() {
 						></DialogTrigger>
 						<DialogContent>
 							<DialogHeader>
-								<DialogTitle>What is this nonsense?</DialogTitle>
+								<DialogTitle>
+									What is this nonsense?
+								</DialogTitle>
 								<DialogDescription>
-									I'm always finding myself taking screengrabs for Github issues and PRs and they wind up being much too large. Sometimes I'll resize them in Photoshop or Affinity, but it seems a little too heavy handed for such a simple task. This little web app is here to make that task quicker. It's likely to be used just by me, but hey, if you're here, I hope you like it, too.
+									I'm always finding myself taking screengrabs
+									for Github issues and PRs and they wind up
+									being much too large. Sometimes I'll resize
+									them in Photoshop or Affinity, but it seems
+									a little too heavy handed for such a simple
+									task. This little web app is here to make
+									that task quicker. It's likely to be used
+									just by me, but hey, if you're here, I hope
+									you like it, too.
 								</DialogDescription>
 							</DialogHeader>
 						</DialogContent>

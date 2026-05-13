@@ -279,7 +279,11 @@ const DropzoneContent = ({ className }: { className?: string }) => {
 							<p className="text-xs text-muted-foreground">
 								{formatBytes(file.size, 2)}
 								{file.width && file.height && (
-									<> &middot; {file.width}px &times; {file.height}px</>
+									<>
+										{" "}
+										&middot; {file.width}px &times;{" "}
+										{file.height}px
+									</>
 								)}
 							</p>
 						)}

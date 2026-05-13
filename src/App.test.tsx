@@ -142,7 +142,9 @@ describe("App", () => {
 		await user.click(removeBtn);
 
 		await waitFor(() =>
-			expect(screen.queryByAltText("Image preview")).not.toBeInTheDocument()
+			expect(
+				screen.queryByAltText("Image preview")
+			).not.toBeInTheDocument()
 		);
 		expect(
 			screen.queryByRole("button", { name: /\.jpg/i })
