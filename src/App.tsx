@@ -156,6 +156,7 @@ export function App() {
 							variant="outline"
 							size="icon"
 							className="rounded-full"
+							aria-label="Toggle theme"
 							onClick={() =>
 								setTheme(theme === "dark" ? "light" : "dark")
 							}
@@ -169,6 +170,7 @@ export function App() {
 										variant="outline"
 										size="icon"
 										className="rounded-full"
+										aria-label="Settings"
 									>
 										<Cog />
 									</Button>
@@ -295,6 +297,7 @@ export function App() {
 									variant="ghost"
 									size="icon"
 									className="rounded-full border border-border"
+									aria-label="About Grabsizer"
 								>
 									<CircleHelp />
 								</Button>
