@@ -6,28 +6,28 @@ import {
 	useRef,
 	useState,
 	type PropsWithChildren,
-} from "react";
-import { File as FileIcon, Upload, X } from "lucide-react";
+} from 'react';
+import { File as FileIcon, Upload, X } from 'lucide-react';
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 export const formatBytes = (
 	bytes: number,
 	decimals = 2,
-	size?: "bytes" | "KB" | "MB" | "GB" | "TB" | "PB" | "EB" | "ZB" | "YB"
+	size?: 'bytes' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB' | 'EB' | 'ZB' | 'YB'
 ) => {
 	const k = 1000;
 	const dm = decimals < 0 ? 0 : decimals;
-	const sizes = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+	const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 	if (bytes === 0 || bytes === undefined)
-		return size !== undefined ? `0 ${size}` : "0 bytes";
+		return size !== undefined ? `0 ${size}` : '0 bytes';
 	const i =
 		size !== undefined
 			? sizes.indexOf(size)
 			: Math.floor(Math.log(bytes) / Math.log(k));
-	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
 type DropzoneFile = {
@@ -70,7 +70,7 @@ const Dropzone = ({
 	children,
 	maxFiles = 1,
 	maxFileSize = Number.POSITIVE_INFINITY,
-	accept = "image/*",
+	accept = 'image/*',
 	onChange,
 	onClear,
 }: PropsWithChildren<DropzoneProps>) => {
@@ -96,7 +96,7 @@ const Dropzone = ({
 
 					let width: number | undefined;
 					let height: number | undefined;
-					if (file.type.startsWith("image/")) {
+					if (file.type.startsWith('image/')) {
 						const bitmap = await createImageBitmap(file);
 						width = bitmap.width;
 						height = bitmap.height;
@@ -108,9 +108,9 @@ const Dropzone = ({
 						name: file.name,
 						size: file.size,
 						type: file.type,
-						preview: file.type.startsWith("image/")
+						preview: file.type.startsWith('image/')
 							? URL.createObjectURL(file)
-							: "",
+							: '',
 						width,
 						height,
 						errors,
@@ -141,7 +141,7 @@ const Dropzone = ({
 			dragCounter.current++;
 			setIsDragActive(true);
 			const hasReject = Array.from(e.dataTransfer.items).some(
-				(item) => !item.type.startsWith("image/")
+				(item) => !item.type.startsWith('image/')
 			);
 			setIsDragReject(hasReject);
 		},
@@ -163,13 +163,13 @@ const Dropzone = ({
 	useEffect(() => {
 		const handlePaste = (e: ClipboardEvent) => {
 			const files = Array.from(e.clipboardData?.items ?? [])
-				.filter((item) => item.type.startsWith("image/"))
+				.filter((item) => item.type.startsWith('image/'))
 				.map((item) => item.getAsFile())
 				.filter((f): f is File => f !== null);
 			if (files.length > 0) processFiles(files);
 		};
-		document.addEventListener("paste", handlePaste);
-		return () => document.removeEventListener("paste", handlePaste);
+		document.addEventListener('paste', handlePaste);
+		return () => document.removeEventListener('paste', handlePaste);
 	}, [processFiles]);
 
 	const handleInputChange = useCallback(
@@ -199,11 +199,11 @@ const Dropzone = ({
 		>
 			<div
 				className={cn(
-					"cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/25 bg-card p-6 text-center text-foreground transition-colors duration-200",
+					'cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/25 bg-card p-6 text-center text-foreground transition-colors duration-200',
 					isDragActive &&
 						!isDragReject &&
-						"border-primary bg-primary/10",
-					isInvalid && "border-destructive bg-destructive/10",
+						'border-primary bg-primary/10',
+					isInvalid && 'border-destructive bg-destructive/10',
 					className
 				)}
 				onDrop={handleDrop}
@@ -244,13 +244,13 @@ const DropzoneContent = ({ className }: { className?: string }) => {
 	if (files.length === 0) return null;
 
 	return (
-		<div className={cn("flex flex-col", className)}>
+		<div className={cn('flex flex-col', className)}>
 			{files.map((file, idx) => (
 				<div
 					key={`${file.name}-${idx}`}
 					className="flex items-center gap-x-4 first:mt-2 last:mb-2"
 				>
-					{file.type.startsWith("image/") ? (
+					{file.type.startsWith('image/') ? (
 						<div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border bg-muted">
 							<img
 								src={file.preview}
@@ -273,15 +273,15 @@ const DropzoneContent = ({ className }: { className?: string }) => {
 						</p>
 						{file.errors.length > 0 ? (
 							<p className="text-xs text-destructive">
-								{file.errors.map((e) => e.message).join(", ")}
+								{file.errors.map((e) => e.message).join(', ')}
 							</p>
 						) : (
 							<p className="text-xs text-muted-foreground">
 								{formatBytes(file.size, 2)}
 								{file.width && file.height && (
 									<>
-										{" "}
-										&middot; {file.width}px &times;{" "}
+										{' '}
+										&middot; {file.width}px &times;{' '}
 										{file.height}px
 									</>
 								)}
@@ -310,15 +310,15 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
 	if (files.length > 0) return null;
 
 	return (
-		<div className={cn("flex flex-col items-center gap-y-2", className)}>
+		<div className={cn('flex flex-col items-center gap-y-2', className)}>
 			<Upload size={20} className="text-muted-foreground" />
 			<p className="text-sm">
-				Drop {maxFiles === 1 ? "an image" : `up to ${maxFiles} images`}{" "}
+				Drop {maxFiles === 1 ? 'an image' : `up to ${maxFiles} images`}{' '}
 				here
 			</p>
 			<div className="flex flex-col items-center gap-y-1">
 				<p className="text-xs text-muted-foreground">
-					Drag and drop, paste, or{" "}
+					Drag and drop, paste, or{' '}
 					<span
 						onClick={(e) => {
 							e.stopPropagation();
@@ -326,8 +326,8 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
 						}}
 						className="cursor-pointer underline transition hover:text-foreground"
 					>
-						select {maxFiles === 1 ? "a file" : "files"}
-					</span>{" "}
+						select {maxFiles === 1 ? 'a file' : 'files'}
+					</span>{' '}
 					to get started
 				</p>
 				{maxFileSize !== Number.POSITIVE_INFINITY && (
@@ -343,7 +343,7 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
 const useDropzoneContext = () => {
 	const context = useContext(DropzoneContext);
 	if (!context)
-		throw new Error("useDropzoneContext must be used within a Dropzone");
+		throw new Error('useDropzoneContext must be used within a Dropzone');
 	return context;
 };
 

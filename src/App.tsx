@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
 	Dialog,
 	DialogContent,
@@ -7,18 +7,18 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
 	Dropzone,
 	DropzoneContent,
 	DropzoneEmptyState,
 	formatBytes,
-} from "@/components/dropzone";
-import { ImagePreview } from "@/components/image-preview";
-import { resizeImage } from "@/lib/resize";
-import { Input } from "@/components/ui/input";
-import { SunMoon, Cog, Download, Copy, CircleHelp } from "lucide-react";
-import { useTheme } from "./components/theme-provider";
+} from '@/components/dropzone';
+import { ImagePreview } from '@/components/image-preview';
+import { resizeImage } from '@/lib/resize';
+import { Input } from '@/components/ui/input';
+import { SunMoon, Cog, Download, Copy, CircleHelp } from 'lucide-react';
+import { useTheme } from './components/theme-provider';
 
 type Output = {
 	url: string;
@@ -29,9 +29,9 @@ type Output = {
 };
 
 const SIZE_PRESETS = [
-	{ label: "Small", width: 800 },
-	{ label: "Medium", width: 1200 },
-	{ label: "Large", width: 1600 },
+	{ label: 'Small', width: 800 },
+	{ label: 'Medium', width: 1200 },
+	{ label: 'Large', width: 1600 },
 ] as const;
 
 const DEFAULT_MAX_WIDTH = 1200;
@@ -88,32 +88,32 @@ export function App() {
 			return;
 		}
 
-		if (output.blob.type === "image/png") setPngBlob(output.blob);
+		if (output.blob.type === 'image/png') setPngBlob(output.blob);
 
 		let cancelled = false;
 		createImageBitmap(output.blob).then((bitmap) => {
-			const canvas = document.createElement("canvas");
+			const canvas = document.createElement('canvas');
 			canvas.width = bitmap.width;
 			canvas.height = bitmap.height;
-			canvas.getContext("2d")!.drawImage(bitmap, 0, 0);
+			canvas.getContext('2d')!.drawImage(bitmap, 0, 0);
 			bitmap.close();
-			if (output.blob.type !== "image/png") {
+			if (output.blob.type !== 'image/png') {
 				canvas.toBlob((b) => {
 					if (!cancelled && b) setPngBlob(b);
-				}, "image/png");
+				}, 'image/png');
 			}
 			canvas.toBlob(
 				(b) => {
 					if (!cancelled && b) setJpgBlob(b);
 				},
-				"image/jpeg",
+				'image/jpeg',
 				quality / 100
 			);
 			canvas.toBlob(
 				(b) => {
 					if (!cancelled && b) setWebpBlob(b);
 				},
-				"image/webp",
+				'image/webp',
 				quality / 100
 			);
 		});
@@ -140,7 +140,7 @@ export function App() {
 		(blob: Blob | null, ext: string) => () => {
 			if (!blob || !output) return;
 			const url = URL.createObjectURL(blob);
-			const a = document.createElement("a");
+			const a = document.createElement('a');
 			a.href = url;
 			a.download = output.fileName.replace(/\.[^.]+$/, `.${ext}`);
 			a.click();
@@ -153,13 +153,13 @@ export function App() {
 		if (!pngBlob) return;
 		try {
 			await navigator.clipboard.write([
-				new ClipboardItem({ "image/png": pngBlob }),
+				new ClipboardItem({ 'image/png': pngBlob }),
 			]);
 			setCopied(true);
 			if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
 			copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
 		} catch (e) {
-			console.error("Copy failed:", e);
+			console.error('Copy failed:', e);
 		}
 	}, [pngBlob]);
 
@@ -177,7 +177,7 @@ export function App() {
 					<div className="flex flex-col gap-0 p-2">
 						<h1 className="text-lg font-bold">Grabsizer</h1>
 						<span className="text-xs text-muted-foreground">
-							A <s className="italic">not very useful</s>{" "}
+							A <s className="italic">not very useful</s>{' '}
 							<span className="font-bold">simple</span> image
 							resizer
 						</span>
@@ -189,7 +189,7 @@ export function App() {
 							className="rounded-full"
 							aria-label="Toggle theme"
 							onClick={() =>
-								setTheme(theme === "dark" ? "light" : "dark")
+								setTheme(theme === 'dark' ? 'light' : 'dark')
 							}
 						>
 							<SunMoon />
@@ -229,8 +229,8 @@ export function App() {
 													variant={
 														maxWidth ===
 														preset.width
-															? "default"
-															: "outline"
+															? 'default'
+															: 'outline'
 													}
 													size="sm"
 													onClick={() =>
@@ -272,7 +272,7 @@ export function App() {
 													)
 												}
 												onKeyDown={(e) =>
-													e.key === "Enter" &&
+													e.key === 'Enter' &&
 													e.currentTarget.blur()
 												}
 												className="w-20"
@@ -307,12 +307,12 @@ export function App() {
 							<ImagePreview src={output.url} />
 							<div className="flex flex-col gap-3">
 								<div className="flex flex-wrap justify-center gap-2">
-									{(["jpg", "webp", "png"] as const).map(
+									{(['jpg', 'webp', 'png'] as const).map(
 										(ext) => {
 											const blob =
-												ext === "jpg"
+												ext === 'jpg'
 													? jpgBlob
-													: ext === "webp"
+													: ext === 'webp'
 														? webpBlob
 														: pngBlob;
 											return (
@@ -357,8 +357,8 @@ export function App() {
 												</span>
 												<span className="absolute inset-0 flex items-center">
 													{copied
-														? "Copied!"
-														: "Copy .png"}
+														? 'Copied!'
+														: 'Copy .png'}
 												</span>
 											</span>
 										</span>
@@ -370,7 +370,7 @@ export function App() {
 									</Button>
 								</div>
 								<p className="truncate text-center text-xs text-muted-foreground">
-									{output.fileName} &middot; {output.width} ×{" "}
+									{output.fileName} &middot; {output.width} ×{' '}
 									{output.height}px
 								</p>
 							</div>

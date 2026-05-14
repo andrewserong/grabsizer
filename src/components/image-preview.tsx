@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 type ImagePreviewProps = {
 	src: string;
@@ -8,13 +8,13 @@ type ImagePreviewProps = {
 
 export function ImagePreview({
 	src,
-	alt = "Image preview",
+	alt = 'Image preview',
 	className,
 }: ImagePreviewProps) {
 	return (
 		<figure
 			className={cn(
-				"overflow-hidden rounded-xl shadow-md ring-1 ring-foreground/8",
+				'overflow-hidden rounded-xl shadow-md ring-1 ring-foreground/8',
 				className
 			)}
 		>
