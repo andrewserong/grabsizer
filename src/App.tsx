@@ -174,7 +174,14 @@ export function App() {
 		<div className="flex min-h-svh flex-col">
 			<header className="sticky top-0 z-50 w-full bg-background">
 				<div className="m-auto flex max-w-3xl items-center justify-between p-2">
-					<span className="text-sm leading-none">Grabsizer</span>
+					<div className="flex flex-col gap-0 p-2">
+						<h1 className="text-lg font-bold">Grabsizer</h1>
+						<span className="text-xs text-muted-foreground">
+							A <s className="italic">not very useful</s>{" "}
+							<span className="font-bold">simple</span> image
+							resizer
+						</span>
+					</div>
 					<div className="flex gap-2">
 						<Button
 							variant="outline"

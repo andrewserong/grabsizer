@@ -1,6 +1,6 @@
-# Grabsizer
+# Grabsizer — A not very useful (simple) image resizer
 
-A local, client-side image resizing tool. Drop in an image, resize it, download or copy the result — no uploads to any server.
+A local, client-side image resizing tool. Drop in an image, resize it, and download or copy the result. Nothing is uploaded to any server.
 
 ## Features
 

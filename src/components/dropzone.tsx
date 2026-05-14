@@ -318,7 +318,7 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
 			</p>
 			<div className="flex flex-col items-center gap-y-1">
 				<p className="text-xs text-muted-foreground">
-					Drag and drop or{" "}
+					Drag and drop, paste, or{" "}
 					<span
 						onClick={(e) => {
 							e.stopPropagation();
