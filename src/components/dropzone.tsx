@@ -48,7 +48,7 @@ type DropzoneContextType = {
 	isDragReject: boolean;
 	maxFileSize: number;
 	maxFiles: number;
-	inputRef: React.RefObject<HTMLInputElement>;
+	inputRef: React.RefObject<HTMLInputElement | null>;
 	onClear?: () => void;
 };
 

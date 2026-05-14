@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { resizeMock, toBlobMock } = vi.hoisted(() => ({
-	resizeMock: vi.fn(async () => {}),
+	resizeMock: vi.fn(
+		async (_source: HTMLCanvasElement, _dest: HTMLCanvasElement) => {}
+	),
 	toBlobMock: vi.fn(
 		async (_canvas: HTMLCanvasElement, type: string) =>
 			new Blob(['x'], { type })

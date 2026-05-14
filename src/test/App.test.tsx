@@ -106,7 +106,7 @@ describe('App', () => {
 	});
 
 	it('writes a PNG to the clipboard when copy is clicked', async () => {
-		const writeMock = vi.fn(async () => {});
+		const writeMock = vi.fn(async (_items: unknown) => {});
 		(navigator.clipboard as unknown as { write: typeof writeMock }).write =
 			writeMock;
 
