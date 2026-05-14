@@ -437,6 +437,18 @@ export function App() {
 									you like it, too.
 								</DialogDescription>
 							</DialogHeader>
+							<p className="text-sm text-muted-foreground">
+								Source on{' '}
+								<a
+									href="https://github.com/andrewserong/grabsizer"
+									target="_blank"
+									rel="noreferrer"
+									className="underline underline-offset-3 hover:text-foreground"
+								>
+									GitHub
+								</a>
+								.
+							</p>
 						</DialogContent>
 					</Dialog>
 				</div>

@@ -2,6 +2,8 @@
 
 A local, client-side image resizing tool. Drop in an image, resize it, and download or copy the result. Nothing is uploaded to any server.
 
+Hosted at [andrewserong.github.io/grabsizer](https://andrewserong.github.io/grabsizer/).
+
 ## Features
 
 - Drag and drop, click to browse, or paste an image from the clipboard
@@ -10,6 +12,26 @@ A local, client-side image resizing tool. Drop in an image, resize it, and downl
 - Copy to clipboard as PNG (browser clipboard API only supports PNG)
 - Configurable output quality for JPG and WebP (default 82%)
 - Dark and light mode
+
+## Running locally
+
+Requires [Node.js](https://nodejs.org) (LTS).
+
+```bash
+npm install
+npm run dev
+```
+
+The dev server will print the local URL (typically http://localhost:5173).
+
+Other scripts:
+
+- `npm run build` — type-check and produce a production build in `dist/`
+- `npm run preview` — serve the production build locally
+- `npm run test` — run the Vitest test suite in watch mode (or `npm run test:run` for a single run)
+- `npm run lint` — run ESLint
+- `npm run typecheck` — run TypeScript with no emit
+- `npm run format` — format with Prettier
 
 ## Built with
 
