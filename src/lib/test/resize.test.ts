@@ -14,7 +14,7 @@ vi.mock('pica', () => ({
 	},
 }));
 
-import { resizeImage } from './resize';
+import { resizeImage } from '../resize';
 
 const makeFile = (name = 'shot.png', type = 'image/png') =>
 	new File(['data'], name, { type });

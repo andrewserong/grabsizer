@@ -7,7 +7,7 @@ vi.mock('@/lib/resize', () => ({
 	resizeImage: (...args: unknown[]) => resizeImageMock(...args),
 }));
 
-import App from './App';
+import App from '../App';
 import { ThemeProvider } from '@/components/theme-provider';
 
 const renderApp = () =>
