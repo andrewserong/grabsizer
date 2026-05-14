@@ -12,8 +12,8 @@ import {
 	Dropzone,
 	DropzoneContent,
 	DropzoneEmptyState,
-	formatBytes,
 } from '@/components/dropzone';
+import { formatBytes } from '@/lib/format';
 import { ImagePreview } from '@/components/image-preview';
 import { resizeImage } from '@/lib/resize';
 import { Input } from '@/components/ui/input';
@@ -51,18 +51,26 @@ export function App() {
 
 	const handleFilesChange = useCallback((files: File[]) => {
 		const file = files[0];
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 		setOriginalFile(file);
 	}, []);
 
 	// Re-run resize when the file or max width changes
 	useEffect(() => {
-		if (!originalFile) return;
+		if (!originalFile) {
+			return;
+		}
 		let cancelled = false;
 		resizeImage(originalFile, { maxWidth }).then((result) => {
-			if (cancelled) return;
+			if (cancelled) {
+				return;
+			}
 			const url = URL.createObjectURL(result.blob);
-			if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+			if (prevUrlRef.current) {
+				URL.revokeObjectURL(prevUrlRef.current);
+			}
 			prevUrlRef.current = url;
 			setOutput({
 				url,
@@ -82,36 +90,43 @@ export function App() {
 	// JPG and WebP always go through canvas so the quality setting is applied.
 	useEffect(() => {
 		if (!output) {
-			setPngBlob(null);
-			setJpgBlob(null);
-			setWebpBlob(null);
 			return;
 		}
 
-		if (output.blob.type === 'image/png') setPngBlob(output.blob);
-
 		let cancelled = false;
 		createImageBitmap(output.blob).then((bitmap) => {
+			if (cancelled) {
+				bitmap.close();
+				return;
+			}
 			const canvas = document.createElement('canvas');
 			canvas.width = bitmap.width;
 			canvas.height = bitmap.height;
 			canvas.getContext('2d')!.drawImage(bitmap, 0, 0);
 			bitmap.close();
-			if (output.blob.type !== 'image/png') {
+			if (output.blob.type === 'image/png') {
+				setPngBlob(output.blob);
+			} else {
 				canvas.toBlob((b) => {
-					if (!cancelled && b) setPngBlob(b);
+					if (!cancelled && b) {
+						setPngBlob(b);
+					}
 				}, 'image/png');
 			}
 			canvas.toBlob(
 				(b) => {
-					if (!cancelled && b) setJpgBlob(b);
+					if (!cancelled && b) {
+						setJpgBlob(b);
+					}
 				},
 				'image/jpeg',
 				quality / 100
 			);
 			canvas.toBlob(
 				(b) => {
-					if (!cancelled && b) setWebpBlob(b);
+					if (!cancelled && b) {
+						setWebpBlob(b);
+					}
 				},
 				'image/webp',
 				quality / 100
@@ -133,12 +148,16 @@ export function App() {
 		setJpgBlob(null);
 		setWebpBlob(null);
 		setCopied(false);
-		if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+		if (copiedTimerRef.current) {
+			clearTimeout(copiedTimerRef.current);
+		}
 	}, []);
 
 	const makeDownloadHandler = useCallback(
 		(blob: Blob | null, ext: string) => () => {
-			if (!blob || !output) return;
+			if (!blob || !output) {
+				return;
+			}
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
 			a.href = url;
@@ -150,13 +169,17 @@ export function App() {
 	);
 
 	const handleCopy = useCallback(async () => {
-		if (!pngBlob) return;
+		if (!pngBlob) {
+			return;
+		}
 		try {
 			await navigator.clipboard.write([
 				new ClipboardItem({ 'image/png': pngBlob }),
 			]);
 			setCopied(true);
-			if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+			if (copiedTimerRef.current) {
+				clearTimeout(copiedTimerRef.current);
+			}
 			copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
 		} catch (e) {
 			console.error('Copy failed:', e);
@@ -165,8 +188,12 @@ export function App() {
 
 	useEffect(() => {
 		return () => {
-			if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-			if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+			if (prevUrlRef.current) {
+				URL.revokeObjectURL(prevUrlRef.current);
+			}
+			if (copiedTimerRef.current) {
+				clearTimeout(copiedTimerRef.current);
+			}
 		};
 	}, []);
 

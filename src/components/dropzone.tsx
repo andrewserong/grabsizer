@@ -10,25 +10,8 @@ import {
 import { File as FileIcon, Upload, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { formatBytes } from '@/lib/format';
 import { Button } from '@/components/ui/button';
-
-export const formatBytes = (
-	bytes: number,
-	decimals = 2,
-	size?: 'bytes' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB' | 'EB' | 'ZB' | 'YB'
-) => {
-	const k = 1000;
-	const dm = decimals < 0 ? 0 : decimals;
-	const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-	if (bytes === 0 || bytes === undefined)
-		return size !== undefined ? `0 ${size}` : '0 bytes';
-	const i =
-		size !== undefined
-			? sizes.indexOf(size)
-			: Math.floor(Math.log(bytes) / Math.log(k));
-	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-};
 
 type DropzoneFile = {
 	file: File;
@@ -89,10 +72,11 @@ const Dropzone = ({
 					if (
 						maxFileSize !== Number.POSITIVE_INFINITY &&
 						file.size > maxFileSize
-					)
+					) {
 						errors.push({
 							message: `File is larger than ${formatBytes(maxFileSize)}`,
 						});
+					}
 
 					let width: number | undefined;
 					let height: number | undefined;
@@ -129,8 +113,9 @@ const Dropzone = ({
 			dragCounter.current = 0;
 			setIsDragActive(false);
 			setIsDragReject(false);
-			if (e.dataTransfer.files.length > 0)
+			if (e.dataTransfer.files.length > 0) {
 				processFiles(e.dataTransfer.files);
+			}
 		},
 		[processFiles]
 	);
@@ -166,7 +151,9 @@ const Dropzone = ({
 				.filter((item) => item.type.startsWith('image/'))
 				.map((item) => item.getAsFile())
 				.filter((f): f is File => f !== null);
-			if (files.length > 0) processFiles(files);
+			if (files.length > 0) {
+				processFiles(files);
+			}
 		};
 		document.addEventListener('paste', handlePaste);
 		return () => document.removeEventListener('paste', handlePaste);
@@ -174,8 +161,9 @@ const Dropzone = ({
 
 	const handleInputChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
-			if (e.target.files && e.target.files.length > 0)
+			if (e.target.files && e.target.files.length > 0) {
 				processFiles(e.target.files);
+			}
 		},
 		[processFiles]
 	);
@@ -234,14 +222,18 @@ const DropzoneContent = ({ className }: { className?: string }) => {
 			e.stopPropagation();
 			setFiles((prev) => {
 				const next = prev.filter((f) => f.name !== name);
-				if (next.length === 0) onClear?.();
+				if (next.length === 0) {
+					onClear?.();
+				}
 				return next;
 			});
 		},
 		[setFiles, onClear]
 	);
 
-	if (files.length === 0) return null;
+	if (files.length === 0) {
+		return null;
+	}
 
 	return (
 		<div className={cn('flex flex-col', className)}>
@@ -307,7 +299,9 @@ const DropzoneContent = ({ className }: { className?: string }) => {
 const DropzoneEmptyState = ({ className }: { className?: string }) => {
 	const { files, maxFiles, maxFileSize, inputRef } = useDropzoneContext();
 
-	if (files.length > 0) return null;
+	if (files.length > 0) {
+		return null;
+	}
 
 	return (
 		<div className={cn('flex flex-col items-center gap-y-2', className)}>
@@ -342,9 +336,10 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
 
 const useDropzoneContext = () => {
 	const context = useContext(DropzoneContext);
-	if (!context)
+	if (!context) {
 		throw new Error('useDropzoneContext must be used within a Dropzone');
+	}
 	return context;
 };
 
-export { Dropzone, DropzoneContent, DropzoneEmptyState, useDropzoneContext };
+export { Dropzone, DropzoneContent, DropzoneEmptyState };

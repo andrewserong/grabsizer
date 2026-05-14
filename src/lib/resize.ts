@@ -48,7 +48,9 @@ export async function resizeImage(
 	source.width = origWidth;
 	source.height = origHeight;
 	const sourceCtx = source.getContext('2d');
-	if (!sourceCtx) throw new Error('Could not get 2d canvas context');
+	if (!sourceCtx) {
+		throw new Error('Could not get 2d canvas context');
+	}
 	sourceCtx.drawImage(bitmap, 0, 0);
 	bitmap.close();
 

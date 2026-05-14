@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatBytes } from '../dropzone';
+import { formatBytes } from '../format';
 
 describe('formatBytes', () => {
 	it("returns '0 bytes' for 0 with no override", () => {
