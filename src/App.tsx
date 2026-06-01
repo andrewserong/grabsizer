@@ -405,7 +405,7 @@ export function App() {
 					)}
 				</div>
 			</main>
-			<footer className="sticky bottom-0 z-50 w-full bg-background">
+			<footer className="sticky bottom-0 z-50 w-full">
 				<div className="m-auto flex max-w-3xl justify-end p-2">
 					<Dialog>
 						<DialogTrigger
@@ -413,7 +413,7 @@ export function App() {
 								<Button
 									variant="ghost"
 									size="icon"
-									className="rounded-full border border-border"
+									className="rounded-full border border-border bg-background hover:bg-muted dark:hover:bg-muted"
 									aria-label="About Grabsizer"
 								>
 									<CircleHelp />
